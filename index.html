@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thi Thử THPT Quốc Gia</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        *{box-sizing:border-box}
+
+:root{
+    --pink:#e77f9a;
+    --pink-bg:#fde8ef;
+    --green:#0a9b37;
+    --red:#d60000;
+    --sheet-scale:1;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#111;
+    font-family:"Times New Roman",serif;
+}
+
+body.locked .bubble{
+    pointer-events:none;
+}
+
+/* ================= ĐĂNG NHẬP ================= */
+
+.start-screen{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:linear-gradient(135deg,#ffffff,#f7f7f7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+.start-card{
+    width:470px;
+    background:#fff;
+    border:2px solid #000;
+    border-radius:26px;
+    padding:30px 34px;
+    box-shadow:0 24px 80px rgba(0,0,0,.22);
+}
+
+.start-card h1{
+    margin:0 0 6px;
+    text-align:center;
+    font-size:30px;
+}
+
+.start-card .sub{
+    text-align:center;
+    font-size:15px;
+    margin-bottom:22px;
+    color:#555;
+    font-family:Arial,sans-serif;
+}
+
+.start-card input,
+.start-card select{
+    width:100%;
+    height:42px;
+    border:1.7px solid #000;
+    border-radius:13px;
+    margin-bottom:12px;
+    padding:0 13px;
+    font-size:15px;
+    background:white;
+    outline:none;
+}
+
+.start-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:4px;
+}
+
+.start-card button{
+    height:42px;
+    border:2px solid #000;
+    background:#fff;
+    border-radius:14px;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:15px;
+}
+
+.start-card button:hover{
+    background:#f3f3f3;
+}
+
+.error-text{
+    display:none;
+    color:red;
+    font-weight:bold;
+    font-family:Arial,sans-serif;
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+/* ================= THƯ + MÁY BAY ================= */
+
+.letter-stage{
+    position:fixed;
+    inset:0;
+    z-index:10000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:#f7f7f7;
+    overflow:hidden;
+}
+
+.flight-path{
+    position:absolute;
+    top:110px;
+    left:5%;
+    width:90%;
+    height:160px;
+    border-top:3px dashed rgba(0,0,0,.35);
+    border-radius:50%;
+    transform:rotate(-8deg);
+    opacity:0;
+    animation:pathShow 3s ease forwards;
+}
+
+@keyframes pathShow{
+    0%{opacity:0;clip-path:inset(0 100% 0 0)}
+    25%{opacity:.8}
+    100%{opacity:.55;clip-path:inset(0 0 0 0)}
+}
+
+.paper-plane{
+    position:absolute;
+    top:78px;
+    left:-240px;
+    width:190px;
+    height:125px;
+    transform:rotate(-12deg);
+    animation:planeFly 3.4s cubic-bezier(.32,.03,.16,1) forwards;
+}
+
+.plane{
+    position:absolute;
+    width:0;
+    height:0;
+    border-top:50px solid transparent;
+    border-bottom:25px solid transparent;
+    border-left:185px solid #ffcf3f;
+    filter:drop-shadow(0 12px 10px rgba(0,0,0,.28));
+}
+
+.plane:before{
+    content:"";
+    position:absolute;
+    left:-178px;
+    top:-46px;
+    width:0;
+    height:0;
+    border-top:43px solid transparent;
+    border-left:130px solid #ffffff;
+    transform:rotate(8deg);
+}
+
+.plane:after{
+    content:"";
+    position:absolute;
+    left:-176px;
+    top:-4px;
+    width:0;
+    height:0;
+    border-bottom:48px solid transparent;
+    border-left:124px solid #ff8a00;
+    transform:rotate(-6deg);
+}
+
+@keyframes planeFly{
+    0%{left:-240px;top:90px;transform:rotate(-12deg) scale(.9)}
+    35%{left:32%;top:80px;transform:rotate(-2deg) scale(1.05)}
+    58%{left:50%;top:105px;transform:rotate(4deg) scale(1.1)}
+    100%{left:115%;top:45px;transform:rotate(-8deg) scale(.95)}
+}
+
+.drop-envelope{
+    position:absolute;
+    width:120px;
+    height:78px;
+    left:50%;
+    top:132px;
+    opacity:0;
+    background:#fff;
+    border:2.5px solid #000;
+    border-radius:5px;
+    transform:translateX(-50%) rotate(0deg);
+    animation:dropEnvelope 1.55s ease forwards;
+    animation-delay:1.9s;
+    box-shadow:0 12px 22px rgba(0,0,0,.18);
+}
+
+.drop-envelope:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(135deg,transparent 49%,#000 50%,transparent 51%),
+        linear-gradient(45deg,transparent 49%,#000 50%,transparent 51%);
+}
+
+@keyframes dropEnvelope{
+    0%{opacity:0;top:132px;transform:translateX(-50%) rotate(0deg) scale(.7)}
+    15%{opacity:1}
+    60%{opacity:1;top:250px;transform:translateX(-50%) rotate(8deg) scale(1.15)}
+    100%{opacity:0;top:320px;transform:translateX(-50%) rotate(-5deg) scale(1.55)}
+}
+
+.letter-card{
+    width:720px;
+    min-height:475px;
+    background:#fff;
+    border:2px solid #000;
+    border-radius:24px;
+    padding:46px 58px 46px 42px;
+    box-shadow:0 28px 90px rgba(0,0,0,.24);
+    opacity:0;
+    transform:translateY(60px) scale(.95);
+    animation:letterShow .8s ease forwards;
+    animation-delay:3s;
+    position:relative;
+}
+
+.letter-card:before{
+    content:"";
+    position:absolute;
+    inset:18px;
+    border:1px solid rgba(0,0,0,.18);
+    border-radius:17px;
+    pointer-events:none;
+}
+
+@keyframes letterShow{
+    to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.letter-card.fold-away{
+    transform-origin:center center;
+    animation:foldIntoPlane 1.25s cubic-bezier(.36,.01,.18,1) forwards;
+}
+
+@keyframes foldIntoPlane{
+    0%{
+        opacity:1;
+        transform:translateY(0) scale(1) rotate(0deg);
+        clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+    }
+    30%{
+        opacity:1;
+        transform:translateY(-8px) scale(.82) rotate(2deg);
+        clip-path:polygon(8% 8%,92% 8%,82% 92%,18% 92%);
+    }
+    60%{
+        opacity:1;
+        transform:translateY(-35px) scale(.48) rotate(18deg) skewX(18deg);
+        clip-path:polygon(0 50%,100% 0,78% 50%,100% 100%);
+    }
+    100%{
+        opacity:0;
+        transform:translateX(420px) translateY(-170px) scale(.18) rotate(34deg) skewX(38deg);
+        clip-path:polygon(0 50%,100% 0,78% 50%,100% 100%);
+    }
+}
+
+.letter-title{
+    text-align:center;
+    font-size:31px;
+    font-weight:bold;
+    text-transform:uppercase;
+    color:#000;
+    margin-bottom:12px;
+}
+
+.letter-line{
+    width:160px;
+    height:2px;
+    background:#000;
+    margin:0 auto 28px;
+}
+
+.letter-content{
+    font-size:20px;
+    line-height:1.75;
+    text-align:justify;
+    color:#1d1d1d;
+}
+
+.letter-sign{
+    text-align:left;
+    margin-top:24px;
+    font-size:19px;
+    line-height:1.5;
+    padding-left:0;
+}
+
+.letter-btn{
+    display:block;
+    margin:28px auto 0;
+    height:42px;
+    padding:0 30px;
+    border:2px solid #000;
+    background:#fff;
+    border-radius:14px;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:16px;
+}
+
+/* ================= LOADING ================= */
+
+.loading-screen{
+    position:fixed;
+    inset:0;
+    z-index:10001;
+    background:#fff;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+}
+
+.loading-plane{
+    position:absolute;
+    top:36%;
+    left:-220px;
+    width:180px;
+    height:120px;
+    animation:loadingPlaneFly 3s cubic-bezier(.3,.02,.18,1) forwards;
+}
+
+.loading-plane .plane{
+    border-left-color:#ffcf3f;
+    filter:drop-shadow(0 8px 8px rgba(0,0,0,.25));
+}
+
+.loading-plane .plane:before{
+    border-left-color:#ffffff;
+}
+
+.loading-plane .plane:after{
+    border-left-color:#ff8a00;
+}
+
+@keyframes loadingPlaneFly{
+    0%{left:-230px;top:42%;transform:rotate(-10deg) scale(.95)}
+    45%{left:42%;top:34%;transform:rotate(2deg) scale(1.08)}
+    100%{left:115%;top:28%;transform:rotate(-6deg) scale(.95)}
+}
+
+.loading-ground{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:80px;
+    height:3px;
+    background:#000;
+}
+
+.loading-trees{
+    position:absolute;
+    left:0;
+    bottom:83px;
+    width:200%;
+    height:110px;
+    animation:loadingTrees 2s linear infinite;
+}
+
+.loading-tree{
+    position:absolute;
+    bottom:0;
+    width:35px;
+    height:90px;
+}
+
+.loading-tree:before{
+    content:"";
+    position:absolute;
+    left:15px;
+    bottom:0;
+    width:5px;
+    height:45px;
+    background:#000;
+}
+
+.loading-tree:after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:38px;
+    width:36px;
+    height:36px;
+    border:3px solid #000;
+    border-radius:50%;
+    background:#fff;
+}
+
+.loading-tree:nth-child(1){left:6%}
+.loading-tree:nth-child(2){left:18%}
+.loading-tree:nth-child(3){left:31%}
+.loading-tree:nth-child(4){left:45%}
+.loading-tree:nth-child(5){left:62%}
+.loading-tree:nth-child(6){left:80%}
+.loading-tree:nth-child(7){left:106%}
+.loading-tree:nth-child(8){left:122%}
+.loading-tree:nth-child(9){left:140%}
+.loading-tree:nth-child(10){left:166%}
+
+@keyframes loadingTrees{
+    from{transform:translateX(0)}
+    to{transform:translateX(-50%)}
+}
+
+.loading-text{
+    position:relative;
+    z-index:5;
+    font-size:22px;
+    font-weight:bold;
+    background:#fff;
+    border:2px solid #000;
+    border-radius:14px;
+    padding:10px 24px;
+}
+
+/* ================= APP ================= */
+
+.app{
+    width:100vw;
+    height:100vh;
+    display:none;
+    grid-template-rows:50px 1fr;
+    background:#ddd;
+}
+
+.topbar{
+    height:50px;
+    width:100vw;
+    background:#fff;
+    border-bottom:2px solid #000;
+    display:grid;
+    grid-template-columns:310px 1fr auto;
+    align-items:center;
+    gap:10px;
+    padding:0 10px;
+    z-index:5000;
+}
+
+.left-brand{
+    height:42px;
+    display:grid;
+    grid-template-columns:34px 1fr;
+    align-items:center;
+    gap:8px;
+}
+
+.stack-controls{
+    width:34px;
+    height:42px;
+    display:grid;
+    grid-template-rows:1fr 1fr;
+    gap:3px;
+}
+
+.stack-controls button{
+    width:34px;
+    height:19px;
+    border:1.5px solid #000;
+    background:#fff;
+    border-radius:7px;
+    font-size:13px;
+    font-weight:bold;
+    line-height:14px;
+    cursor:pointer;
+    padding:0;
+}
+
+.design-text{
+    height:38px;
+    border:2px solid #000;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+    font-family:Arial,sans-serif;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.top-title{
+    text-align:center;
+    font-weight:bold;
+    font-size:28px;
+    color:#000;
+    white-space:nowrap;
+}
+
+.topbar-right{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    position:relative;
+    z-index:6000;
+}
+
+.btn{
+    height:34px;
+    border:1.7px solid #000;
+    background:#fff;
+    border-radius:8px;
+    font-weight:bold;
+    font-size:14px;
+    padding:0 12px;
+    cursor:pointer;
+    white-space:nowrap;
+    position:relative;
+    z-index:6000;
+}
+
+.timer-box{
+    height:34px;
+    border:1.7px solid #000;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 10px;
+    background:#fff;
+    position:relative;
+    z-index:6000;
+}
+
+.timer-display{
+    font-weight:bold;
+    font-size:17px;
+    min-width:66px;
+    text-align:center;
+}
+
+.reset-btn,
+.print-btn{
+    display:none;
+}
+
+body.locked .submit-btn{
+    display:none;
+}
+
+body.locked .reset-btn,
+body.locked .print-btn{
+    display:inline-block;
+}
+
+.split{
+    width:100vw;
+    height:calc(100vh - 50px);
+    display:grid;
+    grid-template-columns:50vw 50vw;
+    overflow:hidden;
+}
+
+/* ================= FILE ĐỀ ================= */
+
+.exam-panel{
+    width:50vw;
+    height:calc(100vh - 50px);
+    background:#e6e6e6;
+    border-right:2px solid #000;
+    overflow:hidden;
+    position:relative;
+}
+
+.exam-viewer{
+    width:100%;
+    height:100%;
+    overflow:auto;
+    background:#e6e6e6;
+    padding:0;
+}
+
+.empty-exam{
+    width:max-content;
+    max-width:80%;
+    margin:80px auto;
+    border:2px dashed #999;
+    background:#fff;
+    padding:28px;
+    font-family:Arial,sans-serif;
+    font-size:15px;
+    text-align:center;
+    color:#444;
+    line-height:24px;
+}
+
+.exam-img{
+    width:100%;
+    height:auto;
+    display:block;
+    background:#fff;
+    margin:0;
+}
+
+.exam-text{
+    width:100%;
+    min-height:100%;
+    background:#fff;
+    padding:18px;
+    font-size:18px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    margin:0;
+}
+
+.pdf-page-wrap{
+    width:100%;
+    background:#fff;
+    margin:0 0 14px 0;
+    padding:0;
+    overflow:hidden;
+    box-shadow:0 0 0 1px #cfcfcf;
+}
+
+.pdf-page{
+    display:block;
+    width:100%;
+    height:auto;
+    background:#fff;
+    margin:0;
+    padding:0;
+}
+
+/* ================= PHIẾU ================= */
+
+.sheet-panel{
+    width:50vw;
+    height:calc(100vh - 50px);
+    background:#dcdcdc;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:0;
+    display:flex;
+    justify-content:flex-start;
+    align-items:flex-start;
+}
+
+.page-holder{
+    width:calc(794px * var(--sheet-scale));
+    min-height:calc(1123px * var(--sheet-scale));
+    flex:0 0 auto;
+}
+
+.page{
+    width:794px;
+    min-height:1123px;
+    background:#fff;
+    border:2px solid #000;
+    padding:26px 30px;
+    position:relative;
+    transform:scale(var(--sheet-scale));
+    transform-origin:top left;
+}
+
+.title{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    margin:0;
+}
+
+.exam-line{
+    text-align:center;
+    font-size:14px;
+    margin-top:3px;
+}
+
+.exam-name{
+    font-size:13px;
+    margin-top:8px;
+}
+
+.top{
+    display:grid;
+    grid-template-columns:145px 245px 300px;
+    gap:8px;
+    margin-top:8px;
+    align-items:start;
+}
+
+.left-info{
+    border:1.4px solid var(--pink);
+    height:252px;
+    background:#fff;
+}
+
+.left-info .box{
+    height:84px;
+    border-bottom:1.4px solid var(--pink);
+    text-align:center;
+    font-size:12px;
+    padding-top:12px;
+}
+
+.left-info .box:last-child{
+    border-bottom:none;
+}
+
+.score-box{
+    padding:0!important;
+    font-size:12px;
+    line-height:18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.score-total{
+    font-size:28px;
+    font-weight:400;
+    color:red;
+    display:block;
+    line-height:1;
+    margin-top:5px;
+}
+
+.mid-info{
+    height:252px;
+    border:1.4px solid var(--pink);
+    background:#fff;
+    padding:8px 8px;
+    font-size:12.5px;
+    line-height:36px;
+    overflow:hidden;
+}
+
+.mid-line{
+    white-space:nowrap;
+    overflow:hidden;
+}
+
+.code-frame{
+    width:300px;
+    height:252px;
+    border:1.4px solid var(--pink);
+    display:grid;
+    grid-template-columns:1fr 1.4px 1fr;
+    overflow:hidden;
+    background:#fff;
+}
+
+.code-divider{
+    width:1.4px;
+    height:100%;
+    background:var(--pink);
+}
+
+.code-block{
+    padding:13px 7px 10px;
+    overflow:hidden;
+}
+
+.code-title{
+    text-align:center;
+    color:#000;
+    font-size:13px;
+    line-height:16px;
+    margin-bottom:8px;
+}
+
+.code-grid{
+    display:grid;
+    grid-template-columns:14px auto;
+    justify-content:center;
+}
+
+.code-spacer{
+    width:14px;
+}
+
+.code-box-row{
+    display:grid;
+    height:24px;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.code-box-row.sbd{
+    grid-template-columns:repeat(6,14px);
+    column-gap:4px;
+}
+
+.code-box-row.made{
+    grid-template-columns:repeat(4,14px);
+    column-gap:4px;
+}
+
+.top-digit-box{
+    width:14px;
+    height:24px;
+    border:1.3px solid var(--pink);
+    color:#000;
+    text-align:center;
+    line-height:23px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.code-row{
+    display:contents;
+}
+
+.side-num{
+    width:14px;
+    height:17px;
+    line-height:17px;
+    text-align:center;
+    color:#000;
+    font-size:12px;
+}
+
+.circle-row{
+    display:grid;
+    height:17px;
+    align-items:center;
+}
+
+.circle-row.sbd{
+    grid-template-columns:repeat(6,14px);
+    column-gap:4px;
+}
+
+.circle-row.made{
+    grid-template-columns:repeat(4,14px);
+    column-gap:4px;
+}
+
+.bubble{
+    width:12px;
+    height:12px;
+    border:1.2px solid var(--pink);
+    border-radius:50%;
+    background:white;
+    display:block;
+    cursor:pointer;
+    margin:auto;
+}
+
+.bubble.active{
+    background:#000;
+    border-color:#000;
+}
+
+.bubble.correct{
+    background:var(--green)!important;
+    border-color:var(--green)!important;
+}
+
+.bubble.wrong{
+    background:var(--red)!important;
+    border-color:var(--red)!important;
+}
+
+.answer-row.correct-row,
+.tf-row.correct-row,
+.num-card.correct-card{
+    background:#e8fff0;
+}
+
+.answer-row.wrong-row,
+.tf-row.wrong-row,
+.num-card.wrong-card{
+    background:#ffecec;
+}
+
+.parts-wrap{
+    margin-top:16px;
+    background:var(--pink-bg);
+    padding:8px 12px 14px;
+    width:100%;
+}
+
+.part-title{
+    font-size:14px;
+    font-weight:bold;
+    margin:0 0 7px 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.part-score{
+    font-size:12px;
+    font-weight:bold;
+    color:#000;
+}
+
+.part1{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    width:100%;
+}
+
+.answer-card{
+    background:white;
+    border:1.4px solid var(--pink);
+    padding:5px 6px 7px;
+    overflow:hidden;
+}
+
+.abcd-head{
+    display:grid;
+    grid-template-columns:22px repeat(4,1fr);
+    color:var(--pink);
+    font-size:10px;
+    font-weight:bold;
+    text-align:center;
+    margin-bottom:3px;
+}
+
+.answer-row{
+    display:grid;
+    grid-template-columns:22px repeat(4,1fr);
+    align-items:center;
+    height:17px;
+    font-size:11.5px;
+}
+
+.qnum{
+    color:#000;
+    font-weight:bold;
+}
+
+.part2{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    width:100%;
+}
+
+.tf-card{
+    background:white;
+    border:1.4px solid var(--pink);
+    overflow:hidden;
+}
+
+.tf-head{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    border-bottom:1.4px solid var(--pink);
+}
+
+.tf-head div{
+    text-align:center;
+    font-size:12.5px;
+    font-weight:bold;
+    padding:4px 0 3px;
+}
+
+.tf-body{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+}
+
+.tf-col{
+    padding:4px 2px 6px;
+    overflow:hidden;
+}
+
+.tf-title{
+    display:grid;
+    grid-template-columns:14px 20px 20px;
+    column-gap:2px;
+    align-items:center;
+    font-size:10px;
+    line-height:12px;
+    text-align:center;
+    margin-bottom:3px;
+    white-space:nowrap;
+}
+
+.tf-title span:nth-child(1){grid-column:2}
+.tf-title span:nth-child(2){grid-column:3}
+
+.tf-row{
+    display:grid;
+    grid-template-columns:14px 20px 20px;
+    column-gap:2px;
+    align-items:center;
+    height:17px;
+    font-size:11px;
+}
+
+.tf-row .bubble{
+    width:11.5px;
+    height:11.5px;
+}
+
+.part3{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    background:white;
+    border:1.4px solid var(--pink);
+    width:100%;
+}
+
+.num-card{
+    border-right:1.4px solid var(--pink);
+    padding:7px 2px 10px;
+    overflow:hidden;
+}
+
+.num-card:last-child{
+    border-right:none;
+}
+
+.num-title{
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:8px;
+    padding-left:6px;
+}
+
+.symbols,
+.num-row{
+    display:grid;
+    grid-template-columns:10px repeat(4,12px);
+    gap:4px;
+    align-items:center;
+    height:17px;
+    font-size:11px;
+    width:max-content;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.num-card .bubble{
+    width:11.5px;
+    height:11.5px;
+}
+
+.score-detail{
+    margin-top:10px;
+    background:#fff;
+    border:1.4px solid var(--pink);
+    padding:8px;
+    font-size:13px;
+    line-height:22px;
+    display:none;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.48);
+    z-index:9000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+}
+
+.modal-content{
+    background:#fff;
+    border:2px solid #000;
+    width:860px;
+    max-height:92vh;
+    overflow:auto;
+    padding:14px;
+    border-radius:18px;
+    position:relative;
+    z-index:9001;
+}
+
+.modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+    font-family:Arial,sans-serif;
+}
+
+.modal-head h3{
+    margin:0;
+    font-size:18px;
+}
+
+.close-btn,
+.save-btn,
+.login-btn{
+    border:1.5px solid #000;
+    background:#fff;
+    padding:6px 10px;
+    font-weight:bold;
+    cursor:pointer;
+    border-radius:8px;
+}
+
+.box-modal{
+    width:390px;
+    background:#fff;
+    border:2px solid #000;
+    padding:18px;
+    font-family:Arial,sans-serif;
+    border-radius:18px;
+    position:relative;
+    z-index:9001;
+}
+
+.box-modal h3{
+    margin:0 0 12px;
+}
+
+.box-modal input,
+.box-modal select{
+    width:100%;
+    padding:8px;
+    border:1.5px solid #000;
+    margin-bottom:10px;
+    border-radius:9px;
+}
+
+.setting-choice{
+    width:100%;
+    height:38px;
+    border:1.5px solid #000;
+    background:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    margin-bottom:8px;
+    border-radius:10px;
+}
+
+.setting-bar{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-bottom:12px;
+    font-family:Arial,sans-serif;
+}
+
+.setting-bar select{
+    padding:6px;
+    border:1.5px solid #000;
+}
+
+.mini-page{
+    width:794px;
+    background:#fff;
+    border:2px solid #000;
+    padding:22px 26px;
+    margin:0 auto;
+}
+
+.mini-page .title{
+    font-size:18px;
+    margin-bottom:12px;
+}
+
+.mini-page .parts-wrap{
+    margin-top:0;
+}
+
+/* ================= PRINT ================= */
+
+@media print{
+    @page{size:A4;margin:0}
+
+    html,body{
+        overflow:visible;
+        background:white;
+    }
+
+    .topbar,
+    .exam-panel,
+    .modal,
+    .start-screen,
+    .letter-stage,
+    .loading-screen,
+    .score-detail{
+        display:none!important;
+    }
+
+    .app{
+        display:block!important;
+        height:auto;
+    }
+
+    .split{
+        display:block;
+        height:auto;
+    }
+
+    .sheet-panel{
+        display:block;
+        width:794px;
+        height:auto;
+        background:white;
+        padding:0;
+        overflow:visible;
+    }
+
+    .page-holder{
+        width:794px!important;
+        min-height:1123px!important;
+    }
+
+    .page{
+        margin:0;
+        width:794px;
+        min-height:1123px;
+        border:2px solid #000;
+        transform:none!important;
+    }
+
+    .score-total,
+    .bubble.correct,
+    .bubble.wrong,
+    .parts-wrap{
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+    }
+}
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+
+
+
+
+
+<!-- MÀN NHẬP THÔNG TIN -->
+<div class="start-screen" id="startScreen">
+    <div class="start-card">
+        <h1>Thông tin thí sinh</h1>
+        <div class="sub">Vui lòng nhập đầy đủ thông tin trước khi vào bài thi</div>
+
+        <div class="error-text" id="entryError">Bạn phải nhập đầy đủ thông tin trước khi vào bài thi.</div>
+
+        <input id="entryName" placeholder="Họ và tên">
+        <input id="entryDob" type="date">
+
+        <select id="entryGender">
+            <option value="">Chọn giới tính</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+        </select>
+
+        <input id="entrySign" placeholder="Chữ ký / ghi tên">
+
+        <div class="start-actions">
+            <button onclick="confirmEntryInfo()">Xác nhận</button>
+            <button onclick="startFullScreen()">Toàn màn hình</button>
+        </div>
+    </div>
+</div>
+
+<!-- MÁY BAY + THƯ -->
+<div class="letter-stage" id="letterStage">
+    <div class="flight-path"></div>
+
+    <div class="paper-plane">
+        <div class="plane"></div>
+    </div>
+
+    <div class="drop-envelope"></div>
+
+    <div class="letter-card" id="letterCard">
+        <div class="letter-title">Thư xác nhận thông tin</div>
+        <div class="letter-line"></div>
+        <div class="letter-content" id="letterContent"></div>
+
+        <div class="letter-sign">
+            Hội đồng thi<br>
+            <b>Thi thử Trung học Phổ thông Quốc gia</b>
+        </div>
+
+        <button class="letter-btn" onclick="startExamAfterLetter()">Bắt đầu thi</button>
+    </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-trees">
+        <div class="loading-tree"></div><div class="loading-tree"></div><div class="loading-tree"></div><div class="loading-tree"></div><div class="loading-tree"></div>
+        <div class="loading-tree"></div><div class="loading-tree"></div><div class="loading-tree"></div><div class="loading-tree"></div><div class="loading-tree"></div>
+    </div>
+
+    <div class="loading-plane">
+        <div class="plane"></div>
+    </div>
+
+    <div class="loading-ground"></div>
+    <div class="loading-text">Đang bay vào phòng thi...</div>
+</div>
+
+<div class="app" id="appRoot">
+
+    <div class="topbar">
+        <div class="left-brand">
+            <div class="stack-controls">
+                <button onclick="backToLogin()" title="Quay lại đăng nhập">←</button>
+                <button onclick="toggleFullScreen()" title="Toàn màn hình">⛶</button>
+            </div>
+            <div class="design-text">Design by Nguyen Văn Hải</div>
+        </div>
+
+        <div class="top-title">THI THỬ TRUNG HỌC PHỔ THÔNG QUỐC GIA</div>
+
+        <div class="topbar-right">
+            <div class="timer-box">
+                <span class="timer-display" id="timerDisplay">50:00</span>
+            </div>
+
+            <button class="btn" onclick="openMainSetting()">Cài đặt</button>
+            <button class="btn submit-btn" onclick="submitExam()">Nộp bài</button>
+            <button class="btn reset-btn" onclick="resetExam()">Reset</button>
+            <button class="btn print-btn" onclick="printResult()">In kết quả</button>
+        </div>
+    </div>
+
+    <div class="split">
+        <section class="exam-panel">
+            <div class="exam-viewer" id="examViewer">
+                <div class="empty-exam">
+                    Bấm Cài đặt → Tải đề lên.<br>
+                    PDF sẽ tự full ngang khung và không bị lẹm trang.
+                </div>
+            </div>
+        </section>
+
+        <section class="sheet-panel" id="sheetPanel">
+            <div class="page-holder" id="pageHolder">
+                <div class="page" id="answerPage">
+
+                    <div class="title">PHIẾU TRẢ LỜI TRẮC NGHIỆM</div>
+                    <div class="exam-line">Kỳ thi <b>Tốt nghiệp THPT</b></div>
+
+                    <div class="exam-name" id="examDateText">
+                        Bài thi: .........................................................Ngày thi: ......../......../ 20.......
+                    </div>
+
+                    <div class="top">
+                        <div class="left-info">
+                            <div class="box score-box">
+                                Điểm
+                                <span class="score-total" id="totalScoreText">...</span>
+                            </div>
+                            <div class="box">Họ tên, chữ ký<br>của cán bộ coi thi 1<br><b>Nghiêm Xuân Tân</b></div>
+                            <div class="box">Họ tên, chữ ký<br>của cán bộ coi thi 2<br><b>Nghiêm Xuân Tân</b></div>
+                        </div>
+
+                        <div class="mid-info">
+                            <div class="mid-line" id="councilLine">1. Hội đồng thi:..............................................</div>
+                            <div class="mid-line" id="locationLine">2. Điểm thi:....................................................</div>
+                            <div class="mid-line" id="roomLine">3. Phòng thi số:..............................................</div>
+                            <div class="mid-line" id="studentNameLine">4. Họ và tên thí sinh:.......................................</div>
+                            <div class="mid-line" id="studentDobLine">5. Ngày sinh: ......../......../...........(Nam/ Nữ).</div>
+                            <div class="mid-line" id="studentSignLine">6. Chữ ký của thí sinh:....................................</div>
+                        </div>
+
+                        <div class="code-frame">
+                            <div class="code-block">
+                                <div class="code-title">7. Số báo danh</div>
+                                <div class="code-grid">
+                                    <div class="code-spacer"></div>
+                                    <div class="code-box-row sbd" id="sbdBoxes"></div>
+                                </div>
+                                <div class="code-grid" id="sbdTable"></div>
+                            </div>
+
+                            <div class="code-divider"></div>
+
+                            <div class="code-block">
+                                <div class="code-title">8. Mã đề thi</div>
+                                <div class="code-grid">
+                                    <div class="code-spacer"></div>
+                                    <div class="code-box-row made" id="madeBoxes"></div>
+                                </div>
+                                <div class="code-grid" id="madeTable"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="parts-wrap">
+                        <div class="part-title">
+                            <span>PHẦN I</span>
+                            <span class="part-score" id="p1ScoreText"></span>
+                        </div>
+                        <div class="part1" id="part1"></div>
+
+                        <div class="part-title" style="margin-top:16px;">
+                            <span>PHẦN II</span>
+                            <span class="part-score" id="p2ScoreText"></span>
+                        </div>
+                        <div class="part2" id="part2"></div>
+
+                        <div class="part-title" style="margin-top:18px;">
+                            <span>PHẦN III</span>
+                            <span class="part-score" id="p3ScoreText"></span>
+                        </div>
+                        <div class="part3" id="part3"></div>
+
+                        <div class="score-detail" id="scoreDetail"></div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<input type="file" id="examFileInput" accept=".pdf,.txt,image/*" hidden>
+
+<!-- CÀI ĐẶT -->
+<div class="modal" id="mainSettingModal">
+    <div class="box-modal">
+        <h3>Cài đặt</h3>
+        <button class="setting-choice" onclick="askUploadPassword()">Tải đề lên</button>
+        <button class="setting-choice" onclick="openPassword()">Nhập đáp án đúng</button>
+        <button class="setting-choice" onclick="openTimerSetting()">Cài đặt đồng hồ</button>
+        <button class="close-btn" onclick="closeMainSetting()">Đóng</button>
+    </div>
+</div>
+
+<div class="modal" id="uploadPasswordModal">
+    <div class="box-modal">
+        <h3>Nhập mật khẩu tải đề</h3>
+        <input type="password" id="uploadPasswordInput" placeholder="Mật khẩu">
+        <button class="login-btn" onclick="checkUploadPassword()">Tải đề lên</button>
+        <button class="close-btn" onclick="closeUploadPassword()">Đóng</button>
+    </div>
+</div>
+
+<div class="modal" id="timerModal">
+    <div class="box-modal">
+        <h3>Cài đặt đồng hồ</h3>
+        <input type="number" id="timerMinutes" min="1" value="50" placeholder="Số phút">
+        <button class="login-btn" onclick="startTimerFromSetting()">Bắt đầu</button>
+        <button class="login-btn" onclick="pauseTimer()">Dừng</button>
+        <button class="login-btn" onclick="resetTimer()">Reset</button>
+        <button class="close-btn" onclick="closeTimerSetting()">Đóng</button>
+    </div>
+</div>
+
+<div class="modal" id="passwordModal">
+    <div class="box-modal">
+        <h3>Nhập mật khẩu cài đặt đáp án</h3>
+        <input type="password" id="passwordInput" placeholder="Mật khẩu">
+        <button class="login-btn" onclick="checkPassword()">Vào cài đặt</button>
+        <button class="close-btn" onclick="closePassword()">Đóng</button>
+    </div>
+</div>
+
+<div class="modal" id="settingModal">
+    <div class="modal-content">
+        <div class="modal-head">
+            <h3>Chế độ chỉnh đáp án</h3>
+            <div>
+                <button class="save-btn" onclick="saveAnswerKey()">Lưu đáp án</button>
+                <button class="close-btn" onclick="closeSetting()">Đóng</button>
+            </div>
+        </div>
+
+        <div class="setting-bar">
+            <label>Môn:</label>
+            <select id="subjectSelect">
+                <option value="physics">Vật lý</option>
+                <option value="math">Toán</option>
+            </select>
+            <span>Nhập đáp án đúng trực tiếp trên phiếu mini bên dưới.</span>
+        </div>
+
+        <div class="mini-page">
+            <div class="title">MẪU NHẬP ĐÁP ÁN ĐÚNG</div>
+            <div class="parts-wrap">
+                <div class="part-title">PHẦN I</div>
+                <div class="part1" id="keyPart1"></div>
+
+                <div class="part-title" style="margin-top:16px;">PHẦN II</div>
+                <div class="part2" id="keyPart2"></div>
+
+                <div class="part-title" style="margin-top:18px;">PHẦN III</div>
+                <div class="part3" id="keyPart3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+const ABCD = ["A","B","C","D"];
+
+let answerKey = {subject:"physics",part1:{},part2:{},part3:{}};
+let locked = false;
+let examStarted = false;
+let lastPdfBuffer = null;
+let lastFileKind = "";
+let lastImageURL = "";
+let lastTextContent = "";
+let studentInfo = null;
+
+/* ================= START ================= */
+
+function startFullScreen(){
+    document.documentElement.requestFullscreen?.();
+}
+
+function confirmEntryInfo(){
+    const name = document.getElementById("entryName").value.trim();
+    const dob = document.getElementById("entryDob").value;
+    const gender = document.getElementById("entryGender").value;
+    const sign = document.getElementById("entrySign").value.trim();
+
+    if(!name || !dob || !gender || !sign){
+        document.getElementById("entryError").style.display = "block";
+        return;
+    }
+
+    const [y,m,d] = dob.split("-");
+    const dobText = `${d}/${m}/${y}`;
+
+    studentInfo = {name,dob,dobText,gender,sign};
+    applyStudentInfoToSheet(studentInfo);
+
+    document.getElementById("startScreen").style.display = "none";
+
+    document.getElementById("letterContent").innerHTML = `
+        Chúng tôi đã ghi nhận thông tin của bạn như sau:
+        <br><br>
+        Họ và tên thí sinh: <b>${name}</b><br>
+        Ngày sinh: <b>${dobText}</b><br>
+        Giới tính: <b>${gender}</b><br>
+        Chữ ký xác nhận: <b>${sign}</b>
+        <br><br>
+        Chúc bạn bước vào bài thi với tinh thần bình tĩnh, tự tin và tập trung.
+        Hãy đọc kỹ đề, phân bổ thời gian hợp lý, kiểm tra lại đáp án trước khi nộp bài
+        và cố gắng đạt kết quả thật tốt trong kỳ thi này.
+    `;
+
+    const letterCard = document.getElementById("letterCard");
+    letterCard.classList.remove("fold-away");
+
+    document.getElementById("letterStage").style.display = "flex";
+}
+
+function startExamAfterLetter(){
+    const letterCard = document.getElementById("letterCard");
+    letterCard.classList.add("fold-away");
+
+    setTimeout(function(){
+        document.getElementById("letterStage").style.display = "none";
+        document.getElementById("loadingScreen").style.display = "flex";
+    }, 1050);
+
+    setTimeout(function(){
+        document.getElementById("loadingScreen").style.display = "none";
+        document.getElementById("appRoot").style.display = "grid";
+        examStarted = true;
+        updateSheetScale();
+        updateTimerDisplay();
+        restoreUploadedExam();
+    }, 4200);
+}
+
+function requireStarted(){
+    if(!examStarted){
+        alert("Bạn cần nhập đầy đủ thông tin thí sinh trước khi vào bài thi.");
+        return false;
+    }
+    return true;
+}
+
+function backToLogin(){
+    const ok = confirm("Quay lại trang đăng nhập? Bài làm sẽ được xóa nhưng thông tin và file đề vẫn được giữ.");
+    if(!ok) return;
+
+    locked = false;
+    examStarted = false;
+    document.body.classList.remove("locked");
+
+    document.getElementById("appRoot").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
+    document.getElementById("letterStage").style.display = "none";
+    document.getElementById("loadingScreen").style.display = "none";
+
+    if(studentInfo){
+        document.getElementById("entryName").value = studentInfo.name;
+        document.getElementById("entryDob").value = studentInfo.dob;
+        document.getElementById("entryGender").value = studentInfo.gender;
+        document.getElementById("entrySign").value = studentInfo.sign;
+    }
+
+    document.getElementById("entryError").style.display = "none";
+
+    document.querySelectorAll(".bubble").forEach(b=>{
+        if(b.dataset.mode==="student"){
+            b.classList.remove("active","correct","wrong");
+        }
+    });
+
+    clearScoreMarks();
+    resetTimer();
+
+    if(studentInfo){
+        applyStudentInfoToSheet(studentInfo);
+    }
+}
+
+function applyStudentInfoToSheet(info){
+    const today = new Date();
+    const examDate = `${String(today.getDate()).padStart(2,"0")}/${String(today.getMonth()+1).padStart(2,"0")}/${today.getFullYear()}`;
+
+    document.getElementById("examDateText").innerHTML =
+        `Bài thi: Vật lý........................................Ngày thi: <b>${examDate}</b>`;
+
+    document.getElementById("councilLine").textContent =
+        "1. Hội đồng thi: THI THỬ THPT QUỐC GIA";
+
+    document.getElementById("locationLine").textContent =
+        "2. Điểm thi: Moon Premium - TN THPT";
+
+    document.getElementById("roomLine").textContent =
+        "3. Phòng thi số: 12A1";
+
+    document.getElementById("studentNameLine").textContent =
+        `4. Họ và tên thí sinh: ${info.name}`;
+
+    document.getElementById("studentDobLine").textContent =
+        `5. Ngày sinh: ${info.dobText} (${info.gender}).`;
+
+    document.getElementById("studentSignLine").textContent =
+        `6. Chữ ký của thí sinh: ${info.sign}`;
+
+    const [year,month,day] = info.dob.split("-");
+    const sbd = `${day}${month}${year.slice(-2)}`;
+    setCodeDigits("sbd",sbd);
+
+    const made = String(Math.floor(1000 + Math.random() * 9000));
+    setCodeDigits("made",made);
+}
+
+function setCodeDigits(type,digits){
+    [...String(digits)].forEach((digit,index)=>{
+        const box = document.getElementById(`${type}-box-${index}`);
+        if(box) box.textContent = digit;
+
+        document
+            .querySelectorAll(`.code-bubble[data-type="${type}"][data-col="${index}"]`)
+            .forEach(b=>{
+                b.classList.toggle("active", b.dataset.digit === digit);
+            });
+    });
+}
+
+/* ================= CÀI ĐẶT ================= */
+
+function openMainSetting(){
+    if(!requireStarted()) return;
+    if(locked) return;
+    document.getElementById("mainSettingModal").style.display="flex";
+}
+
+function closeMainSetting(){
+    document.getElementById("mainSettingModal").style.display="none";
+}
+
+/* ================= TIMER ================= */
+
+let timerSeconds = 50 * 60;
+let timerInterval = null;
+
+function formatTime(sec){
+    const m = Math.floor(sec/60);
+    const s = sec%60;
+    return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function updateTimerDisplay(){
+    document.getElementById("timerDisplay").textContent = formatTime(timerSeconds);
+}
+
+function openTimerSetting(){
+    if(!requireStarted()) return;
+    if(locked) return;
+    closeMainSetting();
+    document.getElementById("timerModal").style.display="flex";
+}
+
+function closeTimerSetting(){
+    document.getElementById("timerModal").style.display="none";
+}
+
+function startTimerFromSetting(){
+    const minInput = parseInt(document.getElementById("timerMinutes").value,10);
+    timerSeconds = (isNaN(minInput)||minInput<=0?50:minInput)*60;
+    updateTimerDisplay();
+    closeTimerSetting();
+    startTimer();
+}
+
+function startTimer(){
+    if(timerInterval) return;
+
+    timerInterval = setInterval(()=>{
+        timerSeconds--;
+        updateTimerDisplay();
+
+        if(timerSeconds<=0){
+            clearInterval(timerInterval);
+            timerInterval=null;
+            timerSeconds=0;
+            updateTimerDisplay();
+            alert("Hết giờ làm bài!");
+        }
+    },1000);
+}
+
+function pauseTimer(){
+    clearInterval(timerInterval);
+    timerInterval=null;
+}
+
+function resetTimer(){
+    pauseTimer();
+    const minInput = parseInt(document.getElementById("timerMinutes").value,10);
+    timerSeconds = (isNaN(minInput)||minInput<=0?50:minInput)*60;
+    updateTimerDisplay();
+}
+
+/* ================= FILE ĐỀ ================= */
+
+function askUploadPassword(){
+    if(!requireStarted()) return;
+    if(locked) return;
+    closeMainSetting();
+    document.getElementById("uploadPasswordInput").value="";
+    document.getElementById("uploadPasswordModal").style.display="flex";
+}
+
+function closeUploadPassword(){
+    document.getElementById("uploadPasswordModal").style.display="none";
+}
+
+function checkUploadPassword(){
+    const pass = document.getElementById("uploadPasswordInput").value;
+
+    if(pass==="123123"){
+        closeUploadPassword();
+        document.getElementById("examFileInput").click();
+    }else{
+        alert("Sai mật khẩu!");
+    }
+}
+
+document.getElementById("examFileInput").addEventListener("change",async function(){
+    const file = this.files[0];
+    if(!file) return;
+    await renderExamFile(file);
+});
+
+async function renderExamFile(file){
+    const viewer = document.getElementById("examViewer");
+    viewer.innerHTML="";
+
+    if(file.type.startsWith("image/")){
+        lastFileKind = "image";
+        lastPdfBuffer = null;
+        lastTextContent = "";
+        lastImageURL = URL.createObjectURL(file);
+
+        const img=document.createElement("img");
+        img.src=lastImageURL;
+        img.className="exam-img";
+        viewer.appendChild(img);
+        return;
+    }
+
+    if(file.type==="application/pdf" || file.name.toLowerCase().endsWith(".pdf")){
+        lastFileKind = "pdf";
+        lastImageURL = "";
+        lastTextContent = "";
+        lastPdfBuffer = await file.arrayBuffer();
+        await renderPdfFromBuffer(lastPdfBuffer);
+        return;
+    }
+
+    if(file.type==="text/plain" || file.name.toLowerCase().endsWith(".txt")){
+        lastFileKind = "text";
+        lastPdfBuffer = null;
+        lastImageURL = "";
+
+        const reader=new FileReader();
+        reader.onload=function(e){
+            lastTextContent = e.target.result;
+            renderTextExam(lastTextContent);
+        };
+        reader.readAsText(file,"UTF-8");
+    }
+}
+
+function restoreUploadedExam(){
+    if(lastFileKind === "pdf" && lastPdfBuffer){
+        renderPdfFromBuffer(lastPdfBuffer);
+    }
+
+    if(lastFileKind === "image" && lastImageURL){
+        const viewer = document.getElementById("examViewer");
+        viewer.innerHTML="";
+        const img=document.createElement("img");
+        img.src=lastImageURL;
+        img.className="exam-img";
+        viewer.appendChild(img);
+    }
+
+    if(lastFileKind === "text" && lastTextContent){
+        renderTextExam(lastTextContent);
+    }
+}
+
+function renderTextExam(text){
+    const viewer=document.getElementById("examViewer");
+    viewer.innerHTML="";
+    const pre=document.createElement("div");
+    pre.className="exam-text";
+    pre.textContent=text;
+    viewer.appendChild(pre);
+}
+
+async function renderPdfFromBuffer(buffer){
+    const viewer=document.getElementById("examViewer");
+    viewer.innerHTML="";
+
+    const pdf=await pdfjsLib.getDocument({data:buffer.slice(0)}).promise;
+    const panelWidth=viewer.clientWidth;
+
+    for(let pageNum=1; pageNum<=pdf.numPages; pageNum++){
+        const page=await pdf.getPage(pageNum);
+        const viewport0=page.getViewport({scale:1});
+        const cssScale=panelWidth/viewport0.width;
+        const viewport=page.getViewport({scale:cssScale});
+        const quality=Math.max(window.devicePixelRatio||1,3);
+
+        const wrap=document.createElement("div");
+        wrap.className="pdf-page-wrap";
+
+        const canvas=document.createElement("canvas");
+        canvas.className="pdf-page";
+        canvas.style.width=Math.floor(viewport.width)+"px";
+        canvas.style.height=Math.floor(viewport.height)+"px";
+        canvas.width=Math.floor(viewport.width*quality);
+        canvas.height=Math.floor(viewport.height*quality);
+
+        const ctx=canvas.getContext("2d");
+        ctx.setTransform(quality,0,0,quality,0,0);
+
+        await page.render({canvasContext:ctx,viewport}).promise;
+
+        wrap.appendChild(canvas);
+        viewer.appendChild(wrap);
+    }
+}
+
+/* ================= FULLSCREEN ================= */
+
+function toggleFullScreen(){
+    if(!requireStarted()) return;
+
+    const root = document.documentElement;
+
+    if(!document.fullscreenElement){
+        root.requestFullscreen?.();
+    }else{
+        document.exitFullscreen?.();
+    }
+
+    setTimeout(function(){
+        updateSheetScale();
+        restoreUploadedExam();
+    },300);
+}
+
+function updateSheetScale(){
+    const panel=document.getElementById("sheetPanel");
+    const holder=document.getElementById("pageHolder");
+    if(!panel||!holder) return;
+
+    const scale=panel.clientWidth/794;
+    document.documentElement.style.setProperty("--sheet-scale",scale);
+    holder.style.width=(794*scale)+"px";
+    holder.style.minHeight=(1123*scale)+"px";
+}
+
+let resizePdfTimer=null;
+window.addEventListener("resize",()=>{
+    clearTimeout(resizePdfTimer);
+    resizePdfTimer=setTimeout(()=>{
+        updateSheetScale();
+        restoreUploadedExam();
+    },250);
+});
+
+document.addEventListener("fullscreenchange",()=>{
+    setTimeout(()=>{
+        updateSheetScale();
+        restoreUploadedExam();
+    },100);
+});
+
+/* ================= RENDER PHIẾU ================= */
+
+function normalBubble(group,value,mode){
+    return `<span class="bubble ${mode==="key"?"key-bubble":""}" data-group="${group}" data-value="${value}" data-mode="${mode}"></span>`;
+}
+
+function makeCodeBubble(type,col,digit){
+    return `<span class="bubble code-bubble" data-type="${type}" data-col="${col}" data-digit="${digit}"></span>`;
+}
+
+function createCodeBlock(type,cols,boxId,tableId){
+    let boxes="";
+    for(let i=0;i<cols;i++){
+        boxes+=`<div class="top-digit-box" id="${type}-box-${i}"></div>`;
+    }
+
+    document.getElementById(boxId).innerHTML=boxes;
+
+    let table="";
+    for(let d=0;d<=9;d++){
+        table+=`<div class="code-row"><div class="side-num">${d}</div><div class="circle-row ${type}">`;
+        for(let c=0;c<cols;c++) table+=makeCodeBubble(type,c,d);
+        table+=`</div></div>`;
+    }
+
+    document.getElementById(tableId).innerHTML=table;
+}
+
+function renderPart1(containerId,mode){
+    let html="";
+
+    for(let block=0;block<4;block++){
+        let start=block*10+1;
+
+        html+=`<div class="answer-card">
+            <div class="abcd-head">
+                <span></span><span>A</span><span>B</span><span>C</span><span>D</span>
+            </div>`;
+
+        for(let i=start;i<start+10;i++){
+            html+=`<div class="answer-row" data-row="${mode}-p1-q${i}">
+                <span class="qnum">${i}</span>
+                ${ABCD.map(x=>normalBubble(`${mode}-p1-q${i}`,x,mode)).join("")}
+            </div>`;
+        }
+
+        html+=`</div>`;
+    }
+
+    document.getElementById(containerId).innerHTML=html;
+}
+
+function renderPart2(containerId,mode){
+    let html="";
+
+    for(let b=0;b<4;b++){
+        let c1=b*2+1;
+        let c2=b*2+2;
+
+        html+=`<div class="tf-card">
+            <div class="tf-head"><div>Câu ${c1}</div><div>Câu ${c2}</div></div>
+            <div class="tf-body">`;
+
+        [c1,c2].forEach(cau=>{
+            html+=`<div class="tf-col">
+                <div class="tf-title"><span>Đúng</span><span>Sai</span></div>`;
+
+            ["a","b","c","d"].forEach(y=>{
+                html+=`<div class="tf-row" data-row="${mode}-p2-q${cau}-${y}">
+                    <span>${y})</span>
+                    ${normalBubble(`${mode}-p2-q${cau}-${y}`,"Đ",mode)}
+                    ${normalBubble(`${mode}-p2-q${cau}-${y}`,"S",mode)}
+                </div>`;
+            });
+
+            html+=`</div>`;
+        });
+
+        html+=`</div></div>`;
+    }
+
+    document.getElementById(containerId).innerHTML=html;
+}
+
+function renderPart3(containerId,mode){
+    let html="";
+
+    for(let c=1;c<=6;c++){
+        html+=`<div class="num-card" data-card="${mode}-p3-q${c}">
+            <div class="num-title">Câu ${c}</div>
+            <div class="symbols">
+                <span>−</span>
+                ${normalBubble(`${mode}-p3-q${c}-col1`,"-",mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col2`,"-",mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col3`,"-",mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col4`,"-",mode)}
+            </div>
+            <div class="symbols">
+                <span>,</span>
+                ${normalBubble(`${mode}-p3-q${c}-col1`,",",mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col2`,",",mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col3`,",",mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col4`,",",mode)}
+            </div>`;
+
+        for(let n=0;n<=9;n++){
+            html+=`<div class="num-row">
+                <span>${n}</span>
+                ${normalBubble(`${mode}-p3-q${c}-col1`,String(n),mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col2`,String(n),mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col3`,String(n),mode)}
+                ${normalBubble(`${mode}-p3-q${c}-col4`,String(n),mode)}
+            </div>`;
+        }
+
+        html+=`</div>`;
+    }
+
+    document.getElementById(containerId).innerHTML=html;
+}
+
+function renderAll(){
+    createCodeBlock("sbd",6,"sbdBoxes","sbdTable");
+    createCodeBlock("made",4,"madeBoxes","madeTable");
+
+    renderPart1("part1","student");
+    renderPart2("part2","student");
+    renderPart3("part3","student");
+
+    renderPart1("keyPart1","key");
+    renderPart2("keyPart2","key");
+    renderPart3("keyPart3","key");
+}
+
+/* ================= CLICK ================= */
+
+document.addEventListener("click",function(e){
+    if(!examStarted) return;
+    if(locked) return;
+    if(!e.target.classList.contains("bubble")) return;
+
+    if(e.target.classList.contains("code-bubble")){
+        const type=e.target.dataset.type;
+        const col=e.target.dataset.col;
+        const digit=e.target.dataset.digit;
+        const wasActive=e.target.classList.contains("active");
+
+        document.querySelectorAll(`.code-bubble[data-type="${type}"][data-col="${col}"]`)
+            .forEach(b=>b.classList.remove("active"));
+
+        if(wasActive){
+            document.getElementById(`${type}-box-${col}`).textContent="";
+        }else{
+            e.target.classList.add("active");
+            document.getElementById(`${type}-box-${col}`).textContent=digit;
+        }
+
+        return;
+    }
+
+    const group=e.target.dataset.group;
+    const wasActive=e.target.classList.contains("active");
+
+    document.querySelectorAll(`.bubble[data-group="${group}"]`)
+        .forEach(b=>b.classList.remove("active"));
+
+    if(!wasActive) e.target.classList.add("active");
+
+    clearScoreMarks();
+});
+
+/* ================= ĐÁP ÁN ĐÚNG ================= */
+
+function openPassword(){
+    if(!requireStarted()) return;
+    if(locked) return;
+
+    closeMainSetting();
+    document.getElementById("passwordInput").value="";
+    document.getElementById("passwordModal").style.display="flex";
+}
+
+function closePassword(){
+    document.getElementById("passwordModal").style.display="none";
+}
+
+function checkPassword(){
+    const pass=document.getElementById("passwordInput").value;
+
+    if(pass==="123123"){
+        closePassword();
+        document.getElementById("settingModal").style.display="flex";
+        applyKeyToEditor();
+    }else{
+        alert("Sai mật khẩu!");
+    }
+}
+
+function closeSetting(){
+    document.getElementById("settingModal").style.display="none";
+}
+
+function getSelectedValue(group){
+    const el=document.querySelector(`.bubble[data-group="${group}"].active`);
+    return el?el.dataset.value:"";
+}
+
+function setSelectedValue(group,value){
+    document.querySelectorAll(`.bubble[data-group="${group}"]`).forEach(b=>{
+        b.classList.toggle("active",b.dataset.value===value);
+    });
+}
+
+function collectKeyFromEditor(){
+    let key={
+        subject:document.getElementById("subjectSelect").value,
+        part1:{},
+        part2:{},
+        part3:{}
+    };
+
+    for(let i=1;i<=40;i++){
+        key.part1[i]=getSelectedValue(`key-p1-q${i}`);
+    }
+
+    for(let c=1;c<=8;c++){
+        key.part2[c]={};
+        ["a","b","c","d"].forEach(y=>{
+            key.part2[c][y]=getSelectedValue(`key-p2-q${c}-${y}`);
+        });
+    }
+
+    for(let c=1;c<=6;c++){
+        key.part3[c]=[];
+        for(let col=1;col<=4;col++){
+            key.part3[c].push(getSelectedValue(`key-p3-q${c}-col${col}`));
+        }
+    }
+
+    return key;
+}
+
+function saveAnswerKey(){
+    answerKey=collectKeyFromEditor();
+    localStorage.setItem("answerKeyOMR",JSON.stringify(answerKey));
+    alert("Đã lưu đáp án đúng!");
+}
+
+function loadAnswerKey(){
+    const saved=localStorage.getItem("answerKeyOMR");
+
+    if(saved) answerKey=JSON.parse(saved);
+
+    document.getElementById("subjectSelect").value=answerKey.subject||"physics";
+    applyKeyToEditor();
+}
+
+function applyKeyToEditor(){
+    if(!answerKey) return;
+
+    document.getElementById("subjectSelect").value=answerKey.subject||"physics";
+
+    for(let i=1;i<=40;i++){
+        setSelectedValue(`key-p1-q${i}`,answerKey.part1?.[i]||"");
+    }
+
+    for(let c=1;c<=8;c++){
+        ["a","b","c","d"].forEach(y=>{
+            setSelectedValue(`key-p2-q${c}-${y}`,answerKey.part2?.[c]?.[y]||"");
+        });
+    }
+
+    for(let c=1;c<=6;c++){
+        for(let col=1;col<=4;col++){
+            setSelectedValue(`key-p3-q${c}-col${col}`,answerKey.part3?.[c]?.[col-1]||"");
+        }
+    }
+}
+
+/* ================= CHẤM ĐIỂM ================= */
+
+function clearScoreMarks(){
+    document.querySelectorAll(".bubble.correct,.bubble.wrong").forEach(el=>{
+        el.classList.remove("correct","wrong");
+    });
+
+    document.querySelectorAll(".correct-row,.wrong-row,.correct-card,.wrong-card").forEach(el=>{
+        el.classList.remove("correct-row","wrong-row","correct-card","wrong-card");
+    });
+
+    document.getElementById("p1ScoreText").textContent="";
+    document.getElementById("p2ScoreText").textContent="";
+    document.getElementById("p3ScoreText").textContent="";
+    document.getElementById("totalScoreText").textContent="...";
+    document.getElementById("scoreDetail").style.display="none";
+    document.getElementById("scoreDetail").innerHTML="";
+}
+
+function markGroup(group,correctValue,rowSelector){
+    if(!correctValue) return false;
+
+    const selected=document.querySelector(`.bubble[data-group="${group}"].active`);
+    const correctBubble=document.querySelector(`.bubble[data-group="${group}"][data-value="${correctValue}"]`);
+    const row=rowSelector?document.querySelector(rowSelector):null;
+
+    if(selected && selected.dataset.value===correctValue){
+        selected.classList.add("correct");
+        if(row) row.classList.add("correct-row");
+        return true;
+    }
+
+    if(selected) selected.classList.add("wrong");
+    if(correctBubble) correctBubble.classList.add("correct");
+    if(row) row.classList.add("wrong-row");
+
+    return false;
+}
+
+function markPart3Question(q,isCorrect){
+    const card=document.querySelector(`[data-card="student-p3-q${q}"]`);
+    if(card) card.classList.add(isCorrect?"correct-card":"wrong-card");
+}
+
+function scorePart2(correctCount){
+    if(correctCount===1) return .1;
+    if(correctCount===2) return .25;
+    if(correctCount===3) return .5;
+    if(correctCount===4) return 1;
+    return 0;
+}
+
+function submitExam(){
+    if(!requireStarted()) return;
+
+    const key=JSON.parse(localStorage.getItem("answerKeyOMR")||"null");
+
+    if(!key){
+        alert("Chưa có đáp án đúng. Hãy vào cài đặt để nhập và lưu đáp án trước.");
+        return;
+    }
+
+    clearScoreMarks();
+
+    const subject=key.subject||"physics";
+
+    let p1Score=0,p2Score=0,p3Score=0;
+    let p1Correct=0,p2CorrectDetail=0,p3Correct=0;
+
+    const maxP1=subject==="math"?12:40;
+    const maxP2=subject==="math"?4:8;
+
+    for(let i=1;i<=maxP1;i++){
+        const ok=markGroup(`student-p1-q${i}`,key.part1?.[i]||"",`[data-row="student-p1-q${i}"]`);
+        if(ok){
+            p1Correct++;
+            p1Score+=.25;
+        }
+    }
+
+    for(let c=1;c<=maxP2;c++){
+        let correctInQuestion=0;
+
+        ["a","b","c","d"].forEach(y=>{
+            const ok=markGroup(`student-p2-q${c}-${y}`,key.part2?.[c]?.[y]||"",`[data-row="student-p2-q${c}-${y}"]`);
+            if(ok){
+                correctInQuestion++;
+                p2CorrectDetail++;
+            }
+        });
+
+        p2Score+=scorePart2(correctInQuestion);
+    }
+
+    for(let c=1;c<=6;c++){
+        let allColsCorrect=true;
+        let hasKey=false;
+
+        for(let col=1;col<=4;col++){
+            const correctValue=key.part3?.[c]?.[col-1]||"";
+            if(correctValue) hasKey=true;
+
+            const ok=markGroup(`student-p3-q${c}-col${col}`,correctValue,null);
+            if(!ok) allColsCorrect=false;
+        }
+
+        if(hasKey && allColsCorrect){
+            p3Correct++;
+            p3Score+=subject==="math"?.5:.25;
+            markPart3Question(c,true);
+        }else if(hasKey){
+            markPart3Question(c,false);
+        }
+    }
+
+    const total=p1Score+p2Score+p3Score;
+
+    document.getElementById("p1ScoreText").textContent=`Điểm: ${p1Score.toFixed(2)}`;
+    document.getElementById("p2ScoreText").textContent=`Điểm: ${p2Score.toFixed(2)}`;
+    document.getElementById("p3ScoreText").textContent=`Điểm: ${p3Score.toFixed(2)}`;
+    document.getElementById("totalScoreText").textContent=total.toFixed(2);
+
+    const detail=document.getElementById("scoreDetail");
+    detail.style.display="block";
+    detail.innerHTML=`
+        <b>KẾT QUẢ CHẤM BÀI</b><br>
+        Kỳ thi: Tốt nghiệp THPT<br>
+        Thí sinh: ${studentInfo ? studentInfo.name : ""}<br>
+        Ngày sinh: ${studentInfo ? studentInfo.dobText : ""}<br>
+        Giới tính: ${studentInfo ? studentInfo.gender : ""}<br>
+        Môn: ${subject==="math"?"Toán":"Vật lý"}<br>
+        Phần I: ${p1Score.toFixed(2)} điểm - đúng ${p1Correct}/${maxP1} câu<br>
+        Phần II: ${p2Score.toFixed(2)} điểm - đúng ${p2CorrectDetail}/${maxP2*4} ý<br>
+        Phần III: ${p3Score.toFixed(2)} điểm - đúng ${p3Correct}/6 câu<br>
+        <b>Tổng điểm: ${total.toFixed(2)}</b>
+    `;
+
+    locked=true;
+    document.body.classList.add("locked");
+    pauseTimer();
+}
+
+function resetExam(){
+    locked=false;
+    document.body.classList.remove("locked");
+
+    document.querySelectorAll(".bubble").forEach(b=>{
+        if(b.dataset.mode==="student"){
+            b.classList.remove("active","correct","wrong");
+        }
+    });
+
+    clearScoreMarks();
+    resetTimer();
+
+    if(studentInfo){
+        applyStudentInfoToSheet(studentInfo);
+    }
+}
+
+function printResult(){
+    window.print();
+}
+
+/* ================= KHỞI ĐỘNG ================= */
+
+window.addEventListener("load",function(){
+    renderAll();
+    loadAnswerKey();
+    updateSheetScale();
+    updateTimerDisplay();
+});
+    </script>
+</body>
+</html>
